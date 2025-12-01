@@ -22,3 +22,11 @@ func MustReadFromFile(path string) []string {
 
 	return result
 }
+
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+
+	return x
+}

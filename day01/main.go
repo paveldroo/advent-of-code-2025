@@ -17,7 +17,7 @@ func main() {
 
 func part1(input []string) int {
 	cur := 50
-	zeroesCnt := 0
+	zerosCnt := 0
 
 	for _, in := range input {
 		dir, strVal := in[:1], in[1:]
@@ -33,7 +33,7 @@ func part1(input []string) int {
 				cur = 100 + next
 			} else if next == 0 {
 				cur = 0
-				zeroesCnt++
+				zerosCnt++
 			} else {
 				cur = next
 			}
@@ -44,16 +44,48 @@ func part1(input []string) int {
 				cur = next - 99
 			} else if next == 100 || next == 0 {
 				cur = 0
-				zeroesCnt++
+				zerosCnt++
 			} else {
 				cur = next
 			}
 		}
 	}
 
-	return zeroesCnt
+	return zerosCnt
 }
 
 func part2(input []string) int {
-	return 0
+	cur := 50
+	zerosCnt := 0
+
+	for _, in := range input {
+		dir, strVal := in[:1], in[1:]
+		val, err := strconv.Atoi(strVal)
+		if err != nil {
+			panic(fmt.Errorf("strconv.Atoi(strVal): %w", err))
+		}
+		if dir == "L" {
+			if cur > 0 {
+				cur -= 100
+			}
+			cur -= val
+			clicks := cur / 100
+			zerosCnt -= clicks
+			fmt.Println("zeroCnt:", zerosCnt)
+			cur = cur % 100
+			fmt.Println("CUR:", cur)
+		} else if dir == "R" {
+			if cur < 0 {
+				cur += 100
+			}
+			cur += val
+			clicks := cur / 100
+			zerosCnt += clicks
+			fmt.Println("zeroCnt:", zerosCnt)
+			cur = cur % 100
+			fmt.Println("CUR:", cur)
+		}
+	}
+
+	return zerosCnt
 }
