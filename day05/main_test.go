@@ -16,24 +16,24 @@ func TestPart1(t *testing.T) {
 			name: "first",
 			input: []string{
 				"3-5",
+				"4-5",
 				"10-14",
-				"16-20",
 				"12-18",
+				"19-19",
+				"16-20",
+				"20-22",
+				"23-23",
+				"23-26",
 				"",
-				"1",
-				"17",
-				"5",
-				"8",
-				"32",
-				"11",
+				"123",
 			},
-			want: 3,
+			want: 3 + 13 + 1 + 3,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			res := part1(tc.input)
+			res := part2(tc.input)
 			require.Equal(t, tc.want, res)
 		})
 	}
