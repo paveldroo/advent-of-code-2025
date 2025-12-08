@@ -65,78 +65,53 @@ func part2(input []string) int {
 		curRow := strings.Split(row, "")
 		matrix = append(matrix, curRow)
 	}
-
 	dfs(matrix, 0)
 
 	// fmt.Println("MATRIX:", matrix)
 	return res
 }
 
-func dfs(prevMatrix [][]string, curRowIdx int) {
-	if len(prevMatrix) == 1 {
+func dfs(matrix [][]string, curRowIdx int) {
+	if curRowIdx == len(matrix)-1 {
 		res++
+		fmt.Println("RES:", res)
 		return
 	}
 
-	// fmt.Println("SEEN:", seen)
-	// printMatrix(prevMatrix, curRowIdx)
+	printMatrix(matrix)
 
-	matrix := make([][]string, len(prevMatrix))
-	for i, row := range prevMatrix {
-		newRow := make([]string, len(row))
-		copy(newRow, row)
-		matrix[i] = newRow
-	}
-	fmt.Println("RES:", res)
-	// printMatrix(matrix, curRowIdx)
-
-	nextRow := make([]string, len(matrix[1]))
-	copy(nextRow, matrix[1])
-
-	matrix[1] = nextRow
-	row := matrix[0]
+	nextRow := matrix[curRowIdx+1]
+	row := matrix[curRowIdx]
 	for j := range row {
 		if row[j] == "S" {
 			nextRow[j] = "|"
-			dfs(matrix[1:], curRowIdx+1)
+			dfs(matrix, curRowIdx+1)
+			return
 		}
 		if row[j] == "|" {
 			if nextRow[j] == "^" {
 				if j > 0 {
-					// key := strconv.Itoa(curRowIdx) + "-" + strconv.Itoa(j) + "-" + strconv.Itoa(curRowIdx+1) + "-" + strconv.Itoa(j-1)
-					// if _, ok := seen[key]; !ok {
-					// fmt.Println("SET SEEN TO:", key)
-					// seen[key] = struct{}{}
-					// res++
-					// fmt.Println("RES:", res)
 					nextRow[j-1] = "|"
-					dfs(matrix[1:], curRowIdx+1)
+					dfs(matrix, curRowIdx+1)
 					nextRow[j-1] = "."
-					// }
 				}
 				if j < len(row)-1 {
-					// key := strconv.Itoa(curRowIdx) + "-" + strconv.Itoa(j) + "-" + strconv.Itoa(curRowIdx+1) + "-" + strconv.Itoa(j+1)
-					// if _, ok := seen[key]; !ok {
-					// fmt.Println("SET SEEN TO:", key)
-					// seen[key] = struct{}{}
-					// res++
-					// fmt.Println("RES:", res)
 					nextRow[j+1] = "|"
-					dfs(matrix[1:], curRowIdx+1)
+					dfs(matrix, curRowIdx+1)
 					nextRow[j+1] = "."
-					// }
 				}
 			} else {
 				nextRow[j] = "|"
-				dfs(matrix[1:], curRowIdx+1)
+				dfs(matrix, curRowIdx+1)
+				nextRow[j+1] = "."
 			}
 		}
 	}
 }
 
-func printMatrix(input [][]string, curIdx int) {
+func printMatrix(input [][]string) {
 	fmt.Println("======NEW MATRIX========")
 	for i, row := range input {
-		fmt.Println(fmt.Sprintf("%d%v", curIdx+i, row))
+		fmt.Println(fmt.Sprintf("%d%v", i, row))
 	}
 }
