@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/paveldroo/advent-of-code-2025/utils"
@@ -65,13 +66,13 @@ func part2(input []string) int {
 		curRow := strings.Split(row, "")
 		matrix = append(matrix, curRow)
 	}
-	dfs(matrix, 0)
+	dfs(matrix, 0, "")
 
 	// fmt.Println("MATRIX:", matrix)
 	return res
 }
 
-func dfs(matrix [][]string, curRowIdx int) {
+func dfs(matrix [][]string, curRowIdx int, curRoute string) {
 	if curRowIdx == len(matrix)-1 {
 		res++
 		fmt.Println("RES:", res)
@@ -80,30 +81,53 @@ func dfs(matrix [][]string, curRowIdx int) {
 
 	printMatrix(matrix)
 
-	nextRow := matrix[curRowIdx+1]
 	row := matrix[curRowIdx]
 	for j := range row {
 		if row[j] == "S" {
-			nextRow[j] = "|"
-			dfs(matrix, curRowIdx+1)
+			newMatrix := matrixCopy(matrix)
+			newMatrix[curRowIdx+1][j] = "|"
+			curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+			seen[curRoute] = struct{}{}
+			dfs(newMatrix, curRowIdx+1, curRoute)
 			return
 		}
 		if row[j] == "|" {
-			if nextRow[j] == "^" {
+			if matrix[curRowIdx+1][j] == "^" {
 				if j > 0 {
-					nextRow[j-1] = "|"
-					dfs(matrix, curRowIdx+1)
-					nextRow[j-1] = "."
+					newMatrix := matrixCopy(matrix)
+					newMatrix[curRowIdx+1][j-1] = "|"
+					curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+					if _, ok := seen[curRoute]; !ok {
+						seen[curRoute] = struct{}{}
+						dfs(newMatrix, curRowIdx+1, curRoute)
+					}
+					// nextRow[j-1] = "."
 				}
 				if j < len(row)-1 {
-					nextRow[j+1] = "|"
-					dfs(matrix, curRowIdx+1)
-					nextRow[j+1] = "."
+					newMatrix := matrixCopy(matrix)
+					newMatrix[curRowIdx+1][j+1] = "|"
+					curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+
+					if _, ok := seen[curRoute]; !ok {
+						seen[curRoute] = struct{}{}
+						dfs(newMatrix, curRowIdx+1, curRoute)
+					}
+					// nextRow[j+1] = "."
 				}
 			} else {
-				nextRow[j] = "|"
-				dfs(matrix, curRowIdx+1)
-				nextRow[j+1] = "."
+				newMatrix := matrixCopy(matrix)
+				newMatrix[curRowIdx+1][j] = "|"
+				// if curRowIdx == 4 && j == 7 {
+				// 	fmt.Println("IM HERE")
+				// 	printMatrix(newMatrix)
+				// }
+				curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+
+				if _, ok := seen[curRoute]; !ok {
+					seen[curRoute] = struct{}{}
+					dfs(newMatrix, curRowIdx+1, curRoute)
+				}
+				// nextRow[j+1] = "."
 			}
 		}
 	}
@@ -112,6 +136,22 @@ func dfs(matrix [][]string, curRowIdx int) {
 func printMatrix(input [][]string) {
 	fmt.Println("======NEW MATRIX========")
 	for i, row := range input {
-		fmt.Println(fmt.Sprintf("%d%v", i, row))
+		idx := strconv.Itoa(i)
+		if len(idx) == 1 {
+			idx = "0" + idx
+		}
+		fmt.Println(fmt.Sprintf("%s%v", idx, row))
 	}
+}
+
+func matrixCopy(input [][]string) [][]string {
+	matrix := make([][]string, len(input))
+	copy(matrix, input)
+	for i, row := range input {
+		newRow := make([]string, len(row))
+		copy(newRow, row)
+		matrix[i] = newRow
+	}
+
+	return matrix
 }
