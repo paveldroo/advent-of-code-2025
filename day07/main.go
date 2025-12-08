@@ -16,9 +16,9 @@ func main() {
 	input := utils.MustReadFromFile("input.txt")
 
 	// res := part1(input)
-	res := part2(input)
+	result := part2(input)
 
-	fmt.Printf("TOTAL SPLITS: %d", res)
+	fmt.Printf("TOTAL SPLITS: %d", result)
 }
 
 // func part1(input []string) int {
@@ -86,8 +86,8 @@ func dfs(matrix [][]string, curRowIdx int, curRoute string) {
 		if row[j] == "S" {
 			newMatrix := matrixCopy(matrix)
 			newMatrix[curRowIdx+1][j] = "|"
-			curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-			seen[curRoute] = struct{}{}
+			// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+			// seen[curRoute] = struct{}{}
 			dfs(newMatrix, curRowIdx+1, curRoute)
 			return
 		}
@@ -96,22 +96,22 @@ func dfs(matrix [][]string, curRowIdx int, curRoute string) {
 				if j > 0 {
 					newMatrix := matrixCopy(matrix)
 					newMatrix[curRowIdx+1][j-1] = "|"
-					curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-					if _, ok := seen[curRoute]; !ok {
-						seen[curRoute] = struct{}{}
-						dfs(newMatrix, curRowIdx+1, curRoute)
-					}
+					// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+					// if _, ok := seen[curRoute]; !ok {
+					// 	seen[curRoute] = struct{}{}
+					dfs(newMatrix, curRowIdx+1, curRoute)
+					// }
 					// nextRow[j-1] = "."
 				}
 				if j < len(row)-1 {
 					newMatrix := matrixCopy(matrix)
 					newMatrix[curRowIdx+1][j+1] = "|"
-					curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+					// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
 
-					if _, ok := seen[curRoute]; !ok {
-						seen[curRoute] = struct{}{}
-						dfs(newMatrix, curRowIdx+1, curRoute)
-					}
+					// if _, ok := seen[curRoute]; !ok {
+					// 	seen[curRoute] = struct{}{}
+					dfs(newMatrix, curRowIdx+1, curRoute)
+					// }
 					// nextRow[j+1] = "."
 				}
 			} else {
@@ -121,12 +121,12 @@ func dfs(matrix [][]string, curRowIdx int, curRoute string) {
 				// 	fmt.Println("IM HERE")
 				// 	printMatrix(newMatrix)
 				// }
-				curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
+				// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
 
-				if _, ok := seen[curRoute]; !ok {
-					seen[curRoute] = struct{}{}
-					dfs(newMatrix, curRowIdx+1, curRoute)
-				}
+				// if _, ok := seen[curRoute]; !ok {
+				// 	seen[curRoute] = struct{}{}
+				dfs(newMatrix, curRowIdx+1, curRoute)
+				// }
 				// nextRow[j+1] = "."
 			}
 		}
