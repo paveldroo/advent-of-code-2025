@@ -14,7 +14,6 @@ var seen map[string][]string
 
 func main() {
 	input := utils.MustReadFromFile("input.txt")
-
 	// result := part1(input)
 	result := part2(input)
 
@@ -61,181 +60,68 @@ func part2(input []string) int {
 	_ = part1(input)
 	seen = make(map[string][]string)
 	result := countBeams()
-	// matrix := [][]string{}
-
-	// for _, row := range input {
-	// 	curRow := strings.Split(row, "")
-	// 	matrix = append(matrix, curRow)
-	// }
-
-	// dfs(matrix, 0, "")
-
-	// fmt.Println("MATRIX:", matrix)
 	return result
 }
 
 func countBeams() int {
 	for i, row := range matrix {
-		fmt.Println("beams:", seen)
 		for j, val := range row {
 			if val == "S" {
-				seen[dot(i, j)] = []string{beam("", dot(i, j))}
-				matrix[i][j] = "|"
+				matrix[i][j] = "1"
 				continue
 			}
 			if val == "|" {
-				if matrix[i-1][j] == "|" {
-					if beams, ok := seen[dot(i-1, j)]; ok {
-						newBeams := []string{}
-						for _, bm := range beams {
-							newBeams = append(newBeams, beam(bm, dot(i, j)))
-						}
-						// fmt.Println("NEW BEAMS:", newBeams)
-						delete(seen, dot(i-1, j))
-						seen[dot(i, j)] = newBeams
-					}
-					// for key, _ := range seenCopy(seen) {
-					// 	if strings.HasSuffix(key, dot(i-1, j)) {
-					// 		// fmt.Println("DELETE BEAM:", key)
-					// 		delete(seen, key)
-					// 		newKey := beam(key, dot(i, j))
-					// 		// fmt.Println("ADD BEAM:", newKey)
-					// 		seen[newKey] = struct{}{}
-					// 	}
-					// }
+				if matrix[i-1][j] != "." {
+					matrix[i][j] = matrix[i-1][j]
 				}
-				// matrix[i-1][j] = "."
 			}
-			if val == "^" {
-				if matrix[i-1][j] == "|" {
-					if beams, ok := seen[dot(i-1, j)]; ok {
-						leftNewBeams := []string{}
-						rightNewBeams := []string{}
-						for _, bm := range beams {
-							if j > 0 {
-								leftNewBeams = append(leftNewBeams, beam(bm, dot(i, j-1)))
-							}
-							if j < len(row)-1 {
-								rightNewBeams = append(rightNewBeams, beam(bm, dot(i, j+1)))
-							}
-						}
-						delete(seen, dot(i-1, j))
-						if len(leftNewBeams) > 0 {
-							seen[dot(i, j-1)] = append(seen[dot(i, j-1)], leftNewBeams...)
-						}
-						if len(rightNewBeams) > 0 {
-							seen[dot(i, j+1)] = append(seen[dot(i, j+1)], rightNewBeams...)
-						}
+			if val == "^" && matrix[i-1][j] != "." {
+				du := digit(matrix[i-1][j])
+				if j > 0 {
+					if matrix[i][j-1] == "|" {
+						matrix[i][j-1] = str(du)
+					} else {
+						dl := digit(matrix[i][j-1])
+						matrix[i][j-1] = str(du + dl)
 					}
-					// for key, _ := range seenCopy(seen) {
-					// 	if strings.HasSuffix(key, dot(i-1, j)) {
-					// 		// fmt.Println("DELETE BEAM:", key)
-					// 		delete(seen, key)
-					// 		if j > 0 {
-					// 			newKey := beam(key, dot(i, j-1))
-					// 			// fmt.Println("ADD BEAM:", newKey)
-					// 			seen[newKey] = struct{}{}
-					// 		}
-					// 		if j < len(row)-1 {
-					// 			newKey := beam(key, dot(i, j+1))
-					// 			// fmt.Println("ADD BEAM:", newKey)
-					// 			seen[newKey] = struct{}{}
-					// 		}
-					// 	}
-					// }
 				}
-				// matrix[i-1][j] = "."
+				if j < len(row)-1 {
+					if matrix[i][j+1] == "|" {
+						matrix[i][j+1] = str(du)
+					} else {
+						dr := digit(matrix[i][j+1])
+						matrix[i][j+1] = str(du + dr)
+					}
+				}
+			}
+			if val != "." && val != "|" && val != "^" && matrix[i-1][j] != "." {
+				d := digit(matrix[i][j])
+				matrix[i][j] = str(d + digit(matrix[i-1][j]))
 			}
 		}
 	}
 
-	printMatrix(matrix)
 	cnt := 0
-	for _, row := range seen {
-		cnt += len(row)
+	for _, val := range matrix[len(matrix)-1] {
+		if val != "." {
+			cnt += digit(val)
+		}
 	}
+
 	return cnt
 }
 
-func dot(i, j int) string {
-	return strconv.Itoa(i) + ":" + strconv.Itoa(j)
-}
-
-func beam(b string, point string) string {
-	if b == "" {
-		return point
+func digit(i string) int {
+	val, err := strconv.Atoi(i)
+	if err != nil {
+		panic("not valid int")
 	}
-	return b + "-" + point
+	return val
 }
 
-func seenCopy(seen map[string]struct{}) map[string]struct{} {
-	newSeen := make(map[string]struct{})
-	for key, _ := range seen {
-		newSeen[key] = struct{}{}
-	}
-	return newSeen
+func str(i int) string {
+	return strconv.Itoa(i)
 }
-
-// func dfs(matrix [][]string, curRowIdx int, curRoute string) {
-// 	if curRowIdx == len(matrix)-1 {
-// 		res++
-// 		fmt.Println("RES:", res)
-// 		return
-// 	}
-
-// 	printMatrix(matrix)
-
-// 	row := matrix[curRowIdx]
-// 	for j := range row {
-// 		if row[j] == "S" {
-// 			newMatrix := matrixCopy(matrix)
-// 			newMatrix[curRowIdx+1][j] = "|"
-// 			// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-// 			// seen[curRoute] = struct{}{}
-// 			dfs(newMatrix, curRowIdx+1, curRoute)
-// 			return
-// 		}
-// 		if row[j] == "|" {
-// 			if matrix[curRowIdx+1][j] == "^" {
-// 				if j > 0 {
-// 					newMatrix := matrixCopy(matrix)
-// 					newMatrix[curRowIdx+1][j-1] = "|"
-// 					// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-// 					// if _, ok := seen[curRoute]; !ok {
-// 					// 	seen[curRoute] = struct{}{}
-// 					dfs(newMatrix, curRowIdx+1, curRoute)
-// 					// }
-// 					// nextRow[j-1] = "."
-// 				}
-// 				if j < len(row)-1 {
-// 					newMatrix := matrixCopy(matrix)
-// 					newMatrix[curRowIdx+1][j+1] = "|"
-// 					// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-
-// 					// if _, ok := seen[curRoute]; !ok {
-// 					// 	seen[curRoute] = struct{}{}
-// 					dfs(newMatrix, curRowIdx+1, curRoute)
-// 					// }
-// 					// nextRow[j+1] = "."
-// 				}
-// 			} else {
-// 				newMatrix := matrixCopy(matrix)
-// 				newMatrix[curRowIdx+1][j] = "|"
-// 				// if curRowIdx == 4 && j == 7 {
-// 				// 	fmt.Println("IM HERE")
-// 				// 	printMatrix(newMatrix)
-// 				// }
-// 				// curRoute += fmt.Sprintf("%d-%d", curRowIdx+1, j)
-
-// 				// if _, ok := seen[curRoute]; !ok {
-// 				// 	seen[curRoute] = struct{}{}
-// 				dfs(newMatrix, curRowIdx+1, curRoute)
-// 				// }
-// 				// nextRow[j+1] = "."
-// 			}
-// 		}
-// 	}
-// }
 
 func printMatrix(input [][]string) {
 	fmt.Println("======NEW MATRIX========")
@@ -247,15 +133,3 @@ func printMatrix(input [][]string) {
 		fmt.Println(fmt.Sprintf("%s%v", idx, row))
 	}
 }
-
-// func matrixCopy(input [][]string) [][]string {
-// 	matrix := make([][]string, len(input))
-// 	copy(matrix, input)
-// 	for i, row := range input {
-// 		newRow := make([]string, len(row))
-// 		copy(newRow, row)
-// 		matrix[i] = newRow
-// 	}
-
-// 	return matrix
-// }
